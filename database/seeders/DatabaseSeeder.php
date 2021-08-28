@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionPostsSeeder::class);
         $this->call(SettingsSeeder::class);
         $this->call(VisibilitySeeder::class);
+        $this->call(SocialNetworkSeeder::class);
     }
 }
