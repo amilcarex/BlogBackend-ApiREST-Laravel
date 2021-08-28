@@ -399,22 +399,41 @@ class PostController extends Controller
 
     public function postsToBlog(Request $request)
     {
-        $setting = DB::table('general_settings')->select('pinnedOrder')->first();
+        $setting = DB::table('general_settings')->select('pinnedOrder', 'maxPostsToDisplay')->first();
         $posts = [];
-        if ($request->category == 0 || $request->category == null) {
-            $posts = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->get();
-        } else {
-            $category_id = $request->category;
+        if($setting->maxPostsToDisplay != null || $setting->maxPostsToDisplay != 0){
+            if ($request->category == 0 || $request->category == null) {
+                $posts = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->limit($setting->maxPostsToDisplay)->get();
+            } else {
+                $category_id = $request->category;
 
-            $array_filter = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->with('categories')->get();
-            foreach ($array_filter as $post) {
-                foreach ($post->categories as $category) {
-                    if ($category->id == $category_id) {
-                        array_push($posts, $post);
+                $array_filter = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->with('categories')->get();
+                foreach ($array_filter as $post) {
+                    foreach ($post->categories as $category) {
+                        if ($category->id == $category_id) {
+                            array_push($posts, $post);
+                        }
+                    }
+                }
+            }
+        }else{
+            if ($request->category == 0 || $request->category == null) {
+                $posts = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->get();
+            } else {
+                $category_id = $request->category;
+
+                $array_filter = Post::select('id', 'slug', 'tittle', 'content', 'visibility', 'image', 'updated_at')->where('visibility', '=', 2)->orderBy('updated_at', $setting->pinnedOrder)->with('categories')->get();
+                foreach ($array_filter as $post) {
+                    foreach ($post->categories as $category) {
+                        if ($category->id == $category_id) {
+                            array_push($posts, $post);
+                        }
                     }
                 }
             }
         }
+        
+        
 
 
 
